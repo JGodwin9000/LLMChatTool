@@ -9,17 +9,72 @@
         mc:Ignorable="d"
         Title="LLM Chat Tool" Height="526" Width="862">
     <Window.Resources>
-        <Storyboard x:Key="LoadingBGStoryBoard">
-            <ColorAnimationUsingKeyFrames Storyboard.TargetName="MainGridContainer" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)">
-                <EasingColorKeyFrame KeyTime="00:00:00" Value="#FF09204B"/>
-                <EasingColorKeyFrame KeyTime="00:00:00.3000000" Value="#FF436BB7"/>
-                <EasingColorKeyFrame KeyTime="00:00:00.6000000" Value="#FF09204B"/>
-            </ColorAnimationUsingKeyFrames>
+        <Storyboard x:Key="LoadingBGStoryboard">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainGridContainer" Storyboard.TargetProperty="(Panel.Background).(Brush.RelativeTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)">
-                <EasingDoubleKeyFrame KeyTime="00:00:00" Value="6.34"/>
-                <EasingDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0"/>
-                <EasingDoubleKeyFrame KeyTime="00:00:00.6000000" Value="175.03"/>
+                <EasingDoubleKeyFrame KeyTime="00:00:00" Value="180">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+                <EasingDoubleKeyFrame KeyTime="00:00:00.7000000" Value="0">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
             </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainGridContainer" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[4].(GradientStop.Offset)">
+                <EasingDoubleKeyFrame KeyTime="00:00:00" Value="0.537">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+                <EasingDoubleKeyFrame KeyTime="00:00:00.7000000" Value="0.83">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainGridContainer" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[3].(GradientStop.Offset)">
+                <EasingDoubleKeyFrame KeyTime="00:00:00" Value="0.414">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+                <EasingDoubleKeyFrame KeyTime="00:00:00.7000000" Value="0.103">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainGridContainer" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[0].(GradientStop.Offset)">
+                <EasingDoubleKeyFrame KeyTime="00:00:00" Value="0.19">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+                <EasingDoubleKeyFrame KeyTime="00:00:00.7000000" Value="0">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+            </DoubleAnimationUsingKeyFrames>
+            <ColorAnimationUsingKeyFrames Storyboard.TargetName="MainGridContainer" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)">
+                <EasingColorKeyFrame KeyTime="00:00:00" Value="#FF305AA9">
+                    <EasingColorKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingColorKeyFrame.EasingFunction>
+                </EasingColorKeyFrame>
+                <EasingColorKeyFrame KeyTime="00:00:00.3000000" Value="#FF5E96FF">
+                    <EasingColorKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingColorKeyFrame.EasingFunction>
+                </EasingColorKeyFrame>
+                <EasingColorKeyFrame KeyTime="00:00:00.7000000" Value="#FF1E448A">
+                    <EasingColorKeyFrame.EasingFunction>
+                        <CubicEase EasingMode="EaseInOut"/>
+                    </EasingColorKeyFrame.EasingFunction>
+                </EasingColorKeyFrame>
+            </ColorAnimationUsingKeyFrames>
         </Storyboard>
     </Window.Resources>
     <Window.DataContext>
@@ -32,13 +87,15 @@
                     <TransformGroup>
                         <ScaleTransform CenterY="0.5" CenterX="0.5"/>
                         <SkewTransform CenterX="0.5" CenterY="0.5"/>
-                        <RotateTransform CenterX="0.5" CenterY="0.5"/>
+                        <RotateTransform CenterX="0.5" CenterY="0.5" Angle="126.254"/>
                         <TranslateTransform/>
                     </TransformGroup>
                 </LinearGradientBrush.RelativeTransform>
                 <GradientStop Color="#FF09204B"/>
                 <GradientStop Color="#FF09204B" Offset="1"/>
-                <GradientStop Color="#FF09204B" Offset="0.48"/>
+                <GradientStop Color="#FF305AA9" Offset="0.48"/>
+                <GradientStop Color="#FF29509A" Offset="0.161"/>
+                <GradientStop Color="#FF284E96" Offset="0.741"/>
             </LinearGradientBrush>
         </Grid.Background>
         <Grid.RowDefinitions>

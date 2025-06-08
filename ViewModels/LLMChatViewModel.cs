@@ -15,7 +15,7 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
 {
     public const string STARTUP_MESSAGE = "Let's play with LLM's!";
     private readonly string MODEL_FOLDER_PATH = Path.Combine(AppContext.BaseDirectory, LANGUAGE_MODEL_DIRECTORY);
-    private const string LANGUAGE_MODEL_DIRECTORY = "LLM_MODELS";
+    private const string LANGUAGE_MODEL_DIRECTORY = "GGUF_MODELS";
     private const string TEMPERATURE_TOOLTIP_MESSAGE = "A value between zero and 1. The higher the number, the more creative.";
 
     private ChatMessageViewModel _currentBotMessage = null;
@@ -154,10 +154,6 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
 
     private void Initialize()
     {
-        //// -------- Design time messages ------------ //
-        //_chatMessageCollection.Add(new ChatMessageViewModel() { KindOfMessage = KindOfMessage.Bot, Text = "Hello. I am a Bot Message. rrggeggr .e ererregerggre .rrtetet" });
-        //_chatMessageCollection.Add(new ChatMessageViewModel() { KindOfMessage = KindOfMessage.User, Text = "Hello. I am a User Message. dghfh dfglkhdfgl dflkhdfklg tkl454t4 lhtjht4 545jth4klh c4 c4tjl5jgg l45tgjl 45tlgtcl4t4" });
-        //_chatMessageCollection.Add(new ChatMessageViewModel() { KindOfMessage = KindOfMessage.System, Text = "Hello. I am a System Message. nnn tss nnn tss the system is down, the system is down" });
 
         Messenger.Register<LLMChatViewModel, TextBoxEnterKeyPressedMessage, int>(this, 1, (r, msg) =>
         {

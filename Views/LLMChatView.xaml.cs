@@ -51,8 +51,8 @@ public partial class LLMChatView : Window
 
     private void LLMChatView_Loaded(object sender, RoutedEventArgs e)
     {
-        
-       // LoadingBGStoryBoard.Begin(MainGridContainer);
+        var sb = Resources["LoadingBGStoryboard"] as Storyboard;
+        sb?.Begin();
     }
 
     private void InputTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
