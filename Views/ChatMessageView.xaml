@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="LLMChatTool.Views.ChatMessageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LLMChatTool.Views"
+              xmlns:vm="clr-namespace:LLMChatTool.ViewModels"
+             mc:Ignorable="d">
+    <Grid HorizontalAlignment="Stretch">
+        <Grid HorizontalAlignment="{Binding Path=HorizontalAlignment}">
+            <Rectangle RadiusX="14.2" RadiusY="14.2" Fill="{Binding Path=BackgroundColor}"/>
+            <Border Padding="10">
+                <TextBlock Text="{Binding Mode=OneWay, Path=Text}" d:Text="Message text example. I like apples. What food do you like?" Foreground="Black" Margin="10,10,10,10" TextWrapping="Wrap" FontSize="14"/>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
