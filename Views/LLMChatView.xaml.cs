@@ -38,18 +38,11 @@ public partial class LLMChatView : Window
             ChatListBox.ScrollIntoView(ChatListBox.Items.CurrentItem);
         });
 
-        this.Loaded -= LLMChatView_Loaded;
-        this.Loaded += LLMChatView_Loaded;
         this.ContentRendered -= LLMChatView_ContentRendered;
         this.ContentRendered += LLMChatView_ContentRendered;
     }
 
     private void LLMChatView_ContentRendered(object? sender, EventArgs e)
-    {
-        
-    }
-
-    private void LLMChatView_Loaded(object sender, RoutedEventArgs e)
     {
         var sb = Resources["LoadingBGStoryboard"] as Storyboard;
         sb?.Begin();
