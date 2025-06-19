@@ -8,6 +8,9 @@
         xmlns:views="clr-namespace:LLMChatTool.Views"
         mc:Ignorable="d"
         Title="LLM Chat Tool" Height="526" Width="862">
+    <Window.DataContext>
+        <vm:LLMChatViewModel x:Name="llamaBotVM" />
+    </Window.DataContext>
     <Window.Resources>
         <Storyboard x:Key="LoadingBGStoryboard">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainGridContainer" Storyboard.TargetProperty="(Panel.Background).(Brush.RelativeTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)">
@@ -77,9 +80,6 @@
             </ColorAnimationUsingKeyFrames>
         </Storyboard>
     </Window.Resources>
-    <Window.DataContext>
-        <vm:LLMChatViewModel x:Name="llamaBotVM" />
-    </Window.DataContext>
     <Grid x:Name="MainGridContainer">
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -87,12 +87,12 @@
                     <TransformGroup>
                         <ScaleTransform CenterY="0.5" CenterX="0.5"/>
                         <SkewTransform CenterX="0.5" CenterY="0.5"/>
-                        <RotateTransform CenterX="0.5" CenterY="0.5" Angle="126.254"/>
+                        <RotateTransform CenterX="0.5" CenterY="0.5" Angle="180"/>
                         <TranslateTransform/>
                     </TransformGroup>
                 </LinearGradientBrush.RelativeTransform>
-                <GradientStop Color="#FF09204B"/>
-                <GradientStop Color="#FF09204B" Offset="1"/>
+                <GradientStop Color="#FF093B98"/>
+                <GradientStop Color="#FF093B98" Offset="1"/>
                 <GradientStop Color="#FF305AA9" Offset="0.48"/>
                 <GradientStop Color="#FF29509A" Offset="0.161"/>
                 <GradientStop Color="#FF284E96" Offset="0.741"/>
@@ -113,24 +113,34 @@
                 <RowDefinition Height="82*"/>
             </Grid.RowDefinitions>
             <ComboBox ToolTip="Select Model to use in chat. If there are no models listed, open the models folder using the button below, download a model file to it then restart the app." 
-                ItemsSource="{Binding ModelFileInfos}" SelectedValue="{Binding SelectedModelFileInfo}"  DisplayMemberPath="Name" Margin="10,59,10,0" VerticalAlignment="Top" Background="{x:Null}" Height="24"/>
-            <Label Content="Select Model" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.473,0.674" Height="26" Width="79" Foreground="{DynamicResource LabelForeground}" />
-            <Button Content="Apply" Command="{Binding ApplyChangesCommand}" IsEnabled="{Binding IsDirty}" HorizontalAlignment="Right" Margin="0,172,10,0" Width="117" Background="#FF9CFFAA" Height="38" VerticalAlignment="Top"/>
-            <Label Visibility="{Binding ApplyChangesLabelVisibility}" d:Visibility="Visible"  Content="Click to Apply Changes" Margin="0,215,10,0" VerticalAlignment="Top" Foreground="#FFC4FF61" Height="26" HorizontalAlignment="Right" Width="131"/>
-            <Button Command="{Binding OpenModelsFolderCommand}" Content="Open models folder" Margin="0,0,10,10" Background="#FFA9B9F7" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="131"/>
-            <Slider  Margin="10,120,10,0" TickFrequency="0.1" Value="{Binding Temperature, Mode=TwoWay}" ToolTip="{Binding TemperatureTooltipMessage}" Minimum="0" Maximum="1" IsSnapToTickEnabled="False" VerticalAlignment="Top" Height="19"/>
-            <TextBox x:Name="temperatureTextBox" Margin="94,96,92,0" TextWrapping="Wrap" Text="{Binding Temperature, Mode=TwoWay}" ToolTip="{Binding TemperatureTooltipMessage}" VerticalAlignment="Top" Height="20" />
-            <Label ToolTip="{Binding TemperatureTooltipMessage}" Content="Temperature" HorizontalAlignment="Left" Margin="10,92,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.495,0.448" Height="28" Width="79" Foreground="{DynamicResource LabelForeground}" />
-            <Button Command="{Binding ClearChatComand}" Content="Clear Chat" Margin="10,0,0,10" Background="#FFA9B9F7" HorizontalAlignment="Left" Width="131" Height="20" VerticalAlignment="Bottom"/>
-            <Button Command="{Binding OpenHugginFaceCommand}" Content="Go to HugginFace GGUF models" Margin="10,0,10,35" Height="20" VerticalAlignment="Bottom"/>
-            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch"/>
-            <RichTextBox x:Name="RichTextBoxOutput" Grid.Row="2" Margin="0,5,10,10" Background="#FF141519" Foreground="#FF72FF58">
+                ItemsSource="{Binding ModelFileInfos}" SelectedValue="{Binding SelectedModelFileInfo}"  DisplayMemberPath="Name" Margin="10,37,10,0" VerticalAlignment="Top" Background="{x:Null}" Height="24"/>
+            <Label Content="Select Model" HorizontalAlignment="Left" Margin="10,11,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.473,0.674" Height="26" Width="79" Foreground="{DynamicResource LabelForeground}" />
+            <Button Content="Apply" Command="{Binding ApplyChangesCommand}" IsEnabled="{Binding IsDirty}" HorizontalAlignment="Left" Margin="240,133,0,0" Width="117" Background="#FF9CFFAA" Height="38" VerticalAlignment="Top"/>
+            <Label Visibility="{Binding ApplyChangesLabelVisibility}" d:Visibility="Visible"  Content="Click to Apply Changes" Margin="0,177,10,0" VerticalAlignment="Top" Foreground="#FFC4FF61" Height="26" HorizontalAlignment="Right" Width="131"/>
+            <Button Command="{Binding OpenModelsFolderCommand}" Content="Open models folder" Margin="0,0,10,10" Background="#FF55C2FF" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="131"/>
+            <Slider  Margin="10,98,10,0" TickFrequency="0.1" Value="{Binding Temperature, Mode=TwoWay}" ToolTip="{Binding TemperatureTooltipMessage}" Minimum="0" Maximum="1" IsSnapToTickEnabled="False" VerticalAlignment="Top" Height="19"/>
+            <TextBox x:Name="temperatureTextBox" Margin="94,74,92,0" TextWrapping="Wrap" Text="{Binding Temperature, Mode=TwoWay}" ToolTip="{Binding TemperatureTooltipMessage}" VerticalAlignment="Top" Height="20" />
+            <Label ToolTip="{Binding TemperatureTooltipMessage}" Content="Temperature" HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.495,0.448" Height="28" Width="79" Foreground="{DynamicResource LabelForeground}" />
+            <Button Command="{Binding ClearChatComand}" Content="Clear Chat" Margin="0,0,149,10" Background="#FF55C2FF" HorizontalAlignment="Right" Width="79" Height="20" VerticalAlignment="Bottom"/>
+            <Button Command="{Binding OpenHugginFaceCommand}" Content="Go to HugginFace GGUF models" Margin="0,0,10,35" Height="20" VerticalAlignment="Bottom" Background="#FF5565FF" HorizontalAlignment="Right" Width="218"/>
+            <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1">
+                <GridSplitter.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF55C2FF"/>
+                        <GradientStop Color="#FF55C2FF" Offset="1"/>
+                        <GradientStop Color="#FF006CFF" Offset="0.479"/>
+                        <GradientStop Color="#FF70ADFF"/>
+                    </LinearGradientBrush>
+                </GridSplitter.Background>
+            </GridSplitter>
+            <RichTextBox x:Name="RichTextBoxOutput" IsReadOnly="True" Grid.Row="2" Margin="0,5,10,10" Background="#FF141519" Foreground="#FF72FF58">
                 <FlowDocument>
                     <Paragraph>
                         <Run x:Name="OutputRun" d:Text="12:00:00 PM - sample output"/>
                     </Paragraph>
                 </FlowDocument>
             </RichTextBox>
+            <Button Command="{Binding KillBotCommand}" Content="Kill Bot" Margin="10,0,0,10" Background="#FFFF385C" HorizontalAlignment="Left" Width="79" Height="20" VerticalAlignment="Bottom"/>
         </Grid>
         <ListBox x:Name="ChatListBox" HorizontalContentAlignment="Stretch" ScrollViewer.CanContentScroll="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible" Grid.Row="0" Margin="10,10,10,0" 
             ItemsSource="{Binding ChatMessages}" Background="#FFACD4E6" BorderBrush="#FF2E5DEB" RenderTransformOrigin="0.5,0.5" >
@@ -148,7 +158,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <TextBox x:Name="inputTextBox" KeyDown="InputTextBox_KeyDown" Margin="10,9,149,10" Text="{Binding InputText, Mode=TwoWay}" TextWrapping="Wrap" FontSize="16" Grid.Row="1" Background="#FFACD4E6" RenderTransformOrigin="0.5,0.5">
+        <TextBox x:Name="inputTextBox" KeyDown="InputTextBox_KeyDown" Margin="10,10,149,10" Text="{Binding InputText, Mode=TwoWay}" TextWrapping="Wrap" FontSize="16" Grid.Row="1" Background="#FFACD4E6" RenderTransformOrigin="0.5,0.5">
             <TextBox.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -158,7 +168,7 @@
                 </TransformGroup>
             </TextBox.RenderTransform>
         </TextBox>
-        <Button x:Name="sendButton" Content="Send" Command="{Binding SendInputCommand}" Margin="0,10,10,9" FontSize="18" Foreground="#FF1B4225" Grid.Row="1" Background="#FFACD4E6" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Width="134">
+        <Button x:Name="sendButton" Content="Send" Command="{Binding SendInputCommand}" Margin="351,10,0,10" FontSize="18" Foreground="#FF1B4225" Grid.Row="1" Background="#FFACD4E6" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Width="134">
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>

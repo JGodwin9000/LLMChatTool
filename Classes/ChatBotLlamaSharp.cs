@@ -23,6 +23,7 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
     private DefaultSamplingPipeline _samplePipeline = null;
     private float _temperature = 0.74f;
     private string _modelFullName = string.Empty;
+    private bool _killBot = false;
 
     private EndBotMessage _endBotMessageModel = new EndBotMessage();
     private PartialBotOutputMessage _partialBotOutputModel = new PartialBotOutputMessage();
@@ -110,7 +111,8 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
         }
         catch (Exception ex)
         {
-            OutputSystemMessage($"ERROR.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            OutputSystemMessage($"Error starting the bot. See output window.");
+            OutputAppMessage($"{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
         }
     }
 
@@ -133,14 +135,26 @@ a message of love and peace.";
         {
             await foreach (var text in _session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), _inferenceParams))
             {
-                OutputParialBotMessage(text);
+                if (!_killBot)
+                {
+                    _chatHistory.AddMessage(AuthorRole.User, userInput);
+                    OutputParialBotMessage(text);
+                }
+                else
+                {
+                    _killBot = false;
+                    Dispose();
+                    OutputSystemMessage("Bot has been killed by user.");
+                    OutputAppMessage("Bot has been killed by user.");
+                    break;
+                }
             }
 
             Messenger.Send(_endBotMessageModel, 1);
         }
         catch (Exception ex)
         {
-            OutputSystemMessage($"ERROR.{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            OutputAppMessage($"{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
         }
     }
 
@@ -156,6 +170,11 @@ a message of love and peace.";
         Messenger.Send(_systemOutputModel, 1);
     }
 
+    private void OutputAppMessage(string text)
+    {
+        Messenger.Send(new AppOutputMessage() { Text = text }, 1);
+    }
+
     public void Dispose()
     {
         if (_model != null)
@@ -167,5 +186,10 @@ a message of love and peace.";
         {
             _context.Dispose();
         }
+    }
+
+    public void KillBot()
+    {
+        _killBot = true;
     }
 }

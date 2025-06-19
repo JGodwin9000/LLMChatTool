@@ -1,22 +1,22 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Security.Policy;
-using System.Windows;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LLMChatTool.Classes;
 using LLMChatTool.Models;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
+using System.Windows.Input;
 
 namespace LLMChatTool.ViewModels;
 
 public class LLMChatViewModel : ObservableRecipient, IDisposable
 {
-    public const string STARTUP_MESSAGE = "Let's play with LLM's!";
+    public const string STARTUP_MESSAGE = "Let's Chat!";
     private readonly string MODEL_FOLDER_PATH = Path.Combine(AppContext.BaseDirectory, LANGUAGE_MODEL_DIRECTORY);
     private const string LANGUAGE_MODEL_DIRECTORY = "GGUF_MODELS";
     private const string TEMPERATURE_TOOLTIP_MESSAGE = "A value between zero and 1. The higher the number, the more creative.";
+    private const string NO_MODEL_SELECTED_ERROR = "Unable to start the bot. No model file has been selected.";
 
     private ChatMessageViewModel _currentBotMessage = null;
     private bool _isDirty = false;
@@ -34,6 +34,7 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
     public ICommand ApplyChangesCommand => new RelayCommand(Start);
     public ICommand OpenModelsFolderCommand => new RelayCommand(OpenModelsFolder);
     public ICommand OpenHugginFaceCommand => new RelayCommand(OpenHuggingFace);
+    public ICommand KillBotCommand => new RelayCommand(KillRunningBot);
 
     public ObservableCollection<ChatMessageViewModel> ChatMessages
     {
@@ -187,7 +188,7 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
             _currentBotMessage.Text += msg.Text;
             if (_currentBotMessage.Text.StartsWith("AssistantAssistant:"))
             {
-                _currentBotMessage.Text = _currentBotMessage.Text.Replace("AssistantAssistant:", "Assistant:");
+                _currentBotMessage.Text = _currentBotMessage.Text.Replace("AssistantAssistant:", "Assistant:"); //hack. don't hate me
             }
 
             ScrollToBottom();
@@ -195,8 +196,8 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
 
         if (Directory.Exists(MODEL_FOLDER_PATH))
         {
-            var di = new DirectoryInfo(MODEL_FOLDER_PATH);
-            ModelFileInfos = di.GetFileSystemInfos().ToList();
+            var dirInfo = new DirectoryInfo(MODEL_FOLDER_PATH);
+            ModelFileInfos = dirInfo.GetFileSystemInfos().ToList();
         }
 
         if (!Directory.Exists(MODEL_FOLDER_PATH))
@@ -205,11 +206,17 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
         }
     }
 
+    private void KillRunningBot()
+    {
+        _llamaBot.KillBot();
+    }
+
     private void Start()
     {
         if (_selectedModelFileInfo == null)
         {
-            OutputSystemMessage("Unable to start the bot. No model file has been selected.");
+            OutputAppMessage(NO_MODEL_SELECTED_ERROR);
+            OutputSystemMessage(NO_MODEL_SELECTED_ERROR);
             return;
         }
 
@@ -221,11 +228,18 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
             _llamaBot = new ChatBotLlamaSharp();
         }
 
-        string startMessage = $"{STARTUP_MESSAGE}\n\nModel: {_selectedModelFileInfo.Name}";
-        _chatMessageCollection.Add(new ChatMessageViewModel() { KindOfMessage = KindOfMessage.System, Text = startMessage });
+        OutputSystemMessage($"{STARTUP_MESSAGE}\n\nSeclectedModel: {_selectedModelFileInfo.Name}");
         _llamaBot.Temperature = _temperature;
         _llamaBot.ModelFullName = _selectedModelFileInfo.FullName;
-        _llamaBot.Start();
+        try
+        {
+            _llamaBot.Start();
+        }
+        catch (Exception ex)
+        {
+            OutputAppMessage("An error occured while starting the bot.");
+            OutputAppMessage($"{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
+        }
 
         ScrollToBottom();
     }
@@ -236,12 +250,17 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
         ScrollToBottom();
     }
 
+    private void OutputAppMessage(string text)
+    {
+        Messenger.Send(new AppOutputMessage() { Text = text }, 1);
+    }
+
     private void OpenHuggingFace()
     {
-        using Process process = Process.Start(new ProcessStartInfo 
+        using Process process = Process.Start(new ProcessStartInfo
         {
             FileName = "https://huggingface.co/models?library=gguf&sort=trending",
-            UseShellExecute = true 
+            UseShellExecute = true
         });
     }
 

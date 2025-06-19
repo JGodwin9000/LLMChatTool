@@ -9,8 +9,11 @@ namespace LLMChatTool.Views;
 
 public partial class LLMChatView : Window
 {
+    private const int MAX_OUTPUT_LINES = 1000; // Maximum number of lines to keep in the chat output.
+
     private TextBoxEnterKeyPressedMessage _enterMessage = new TextBoxEnterKeyPressedMessage();
-    private readonly MessengerHelper _messengerHelper;   
+    private readonly MessengerHelper _messengerHelper;  
+    private List<string> _outputLines = new List<string>();
 
     public LLMChatView()
     {
@@ -40,12 +43,31 @@ public partial class LLMChatView : Window
 
         this.ContentRendered -= LLMChatView_ContentRendered;
         this.ContentRendered += LLMChatView_ContentRendered;
+
+        _messengerHelper.Messenger.Register<LLMChatViewModel, AppOutputMessage, int>((LLMChatViewModel)this.DataContext, 1, (r, outputMessage) =>
+        {
+            Output(outputMessage.Text);
+        });
+
+        Output("Application Loaded");
+    }
+
+    private void Output(string text)
+    {
+        _outputLines.Add($"{DateTime.Now.ToLongTimeString()} - {text}");
+        if (_outputLines.Count > MAX_OUTPUT_LINES)
+        {
+            _outputLines.RemoveAt(0);
+        }
+
+        OutputRun.Text = String.Join(Environment.NewLine, _outputLines);
+        RichTextBoxOutput.ScrollToEnd();
     }
 
     private void LLMChatView_ContentRendered(object? sender, EventArgs e)
     {
-        var sb = Resources["LoadingBGStoryboard"] as Storyboard;
-        sb?.Begin();
+        var firsLoadStoryBoard = Resources["LoadingBGStoryboard"] as Storyboard;
+        firsLoadStoryBoard?.Begin();
     }
 
     private void InputTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
