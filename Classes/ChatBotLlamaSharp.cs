@@ -28,6 +28,7 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
     private EndBotMessage _endBotMessageModel = new EndBotMessage();
     private PartialBotOutputMessage _partialBotOutputModel = new PartialBotOutputMessage();
     private SystemOutputMessage _systemOutputModel = new SystemOutputMessage();
+    private AppOutputMessage _appOutputModel = new AppOutputMessage();
 
     public string ModelFullName
     {
@@ -64,12 +65,14 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
         if (string.IsNullOrWhiteSpace(_modelFullName))
         {
             OutputSystemMessage("Please select a model.");
+            OutputAppMessage("Please select a model.");
             return;
         }
 
         if (!File.Exists(_modelFullName))
         {
             OutputSystemMessage($"Selected model file does not exist. {_modelFullName}");
+            OutputAppMessage($"Selected model file does not exist. {_modelFullName}");
             return;
         }
 
@@ -170,7 +173,13 @@ to answer the User's requests immediately and with precision. Bob talks like a y
 
     private void OutputAppMessage(string text)
     {
-        Messenger.Send(new AppOutputMessage() { Text = text }, 1);
+        _appOutputModel.Text = text;
+        Messenger.Send(_appOutputModel, 1);
+    }
+
+    public void KillBot()
+    {
+        _killBot = true;
     }
 
     public void Dispose()
@@ -184,10 +193,5 @@ to answer the User's requests immediately and with precision. Bob talks like a y
         {
             _context.Dispose();
         }
-    }
-
-    public void KillBot()
-    {
-        _killBot = true;
     }
 }
