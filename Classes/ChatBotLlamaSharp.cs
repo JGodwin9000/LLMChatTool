@@ -20,8 +20,6 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
     private ChatHistory _chatHistory = null;
     private ChatSession _session = null;
     private InferenceParams _inferenceParams = null;
-    private DefaultSamplingPipeline _samplePipeline = null;
-    private float _temperature = 0.74f;
     private string _modelFullName = string.Empty;
     private bool _killBot = false;
 
@@ -43,24 +41,7 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
         }
     }
 
-    public float Temperature
-    {
-        get
-        {
-            return _temperature;
-        }
-
-        set
-        {
-            _temperature = value;
-            _samplePipeline = new DefaultSamplingPipeline()
-            {
-                Temperature = _temperature,
-            };
-        }
-    }
-
-    public void Start()
+    public void Start(DefaultSamplingPipeline samplingPipeline)
     {
         if (string.IsNullOrWhiteSpace(_modelFullName))
         {
@@ -95,21 +76,13 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
             _chatHistory.AddMessage(AuthorRole.User, "Hello, Bob");
             _chatHistory.AddMessage(AuthorRole.Assistant, "Hello! How can I help?");
 
-            if (_samplePipeline == null)
-            {
-                _samplePipeline = new DefaultSamplingPipeline()
-                {
-                    Temperature = _temperature,
-                };
-            }
-
             _executor = new InteractiveExecutor(_context);
             _session = new(_executor, _chatHistory);
             _inferenceParams = new InferenceParams()
             {
                 MaxTokens = MAX_TOKENS,
                 AntiPrompts = new List<string> { "User:" }, // Stop generation once antiprompts appear.
-                SamplingPipeline = _samplePipeline,
+                SamplingPipeline = samplingPipeline,
             };
         }
         catch (Exception ex)

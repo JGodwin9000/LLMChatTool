@@ -6,8 +6,9 @@
         xmlns:local="clr-namespace:LLMChatTool"
         xmlns:vm="clr-namespace:LLMChatTool.ViewModels"
         xmlns:views="clr-namespace:LLMChatTool.Views"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="LLM Chat Tool" Height="526" Width="862">
+        Title="LLM Chat Tool" Height="700" Width="1000">
     <Window.DataContext>
         <vm:LLMChatViewModel x:Name="llamaBotVM" />
     </Window.DataContext>
@@ -113,16 +114,12 @@
                 <RowDefinition Height="82*"/>
             </Grid.RowDefinitions>
             <ComboBox ToolTip="Select Model to use in chat. If there are no models listed, open the models folder using the button below, download a model file to it then restart the app." 
-                ItemsSource="{Binding ModelFileInfos}" SelectedValue="{Binding SelectedModelFileInfo}"  DisplayMemberPath="Name" Margin="10,37,10,0" VerticalAlignment="Top" Background="{x:Null}" Height="24"/>
-            <Label Content="Select Model" HorizontalAlignment="Left" Margin="10,11,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.473,0.674" Height="26" Width="79" Foreground="{DynamicResource LabelForeground}" />
-            <Button Content="Apply" Command="{Binding ApplyChangesCommand}" IsEnabled="{Binding IsDirty}" HorizontalAlignment="Left" Margin="240,133,0,0" Width="117" Background="#FF9CFFAA" Height="38" VerticalAlignment="Top"/>
-            <Label Visibility="{Binding ApplyChangesLabelVisibility}" d:Visibility="Visible"  Content="Click to Apply Changes" Margin="0,177,10,0" VerticalAlignment="Top" Foreground="#FFC4FF61" Height="26" HorizontalAlignment="Right" Width="131"/>
-            <Button Command="{Binding OpenModelsFolderCommand}" Content="Open models folder" Margin="0,0,10,10" Background="#FF55C2FF" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="131"/>
-            <Slider  Margin="10,98,10,0" TickFrequency="0.1" Value="{Binding Temperature, Mode=TwoWay}" ToolTip="{Binding TemperatureTooltipMessage}" Minimum="0" Maximum="1" IsSnapToTickEnabled="False" VerticalAlignment="Top" Height="19"/>
-            <TextBox x:Name="temperatureTextBox" Margin="94,74,92,0" TextWrapping="Wrap" Text="{Binding Temperature, Mode=TwoWay}" ToolTip="{Binding TemperatureTooltipMessage}" VerticalAlignment="Top" Height="20" />
-            <Label ToolTip="{Binding TemperatureTooltipMessage}" Content="Temperature" HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.495,0.448" Height="28" Width="79" Foreground="{DynamicResource LabelForeground}" />
-            <Button Command="{Binding ClearChatComand}" Content="Clear Chat" Margin="0,0,149,10" Background="#FF55C2FF" HorizontalAlignment="Right" Width="79" Height="20" VerticalAlignment="Bottom"/>
-            <Button Command="{Binding OpenHugginFaceCommand}" Content="Go to HugginFace GGUF models" Margin="0,0,10,35" Height="20" VerticalAlignment="Bottom" Background="#FF5565FF" HorizontalAlignment="Right" Width="218"/>
+                ItemsSource="{Binding ModelFileInfos}" SelectedValue="{Binding SelectedModelFileInfo}"  DisplayMemberPath="Name" Margin="93,9,10,0" VerticalAlignment="Top" Background="{x:Null}" Height="24"/>
+            <Label Content="Select Model" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.473,0.674" Height="26" Width="79" Foreground="{DynamicResource LabelForeground}" />
+            <Button Content="Apply" Command="{Binding ApplyChangesCommand}" IsEnabled="{Binding IsDirty}" Margin="0,38,10,0" Background="#FF9CFFAA" Height="25" VerticalAlignment="Top" HorizontalAlignment="Right" Width="117"/>
+            <Button Command="{Binding OpenModelsFolderCommand}" Content="Open models folder" Margin="0,0,10,5" Background="#FF55C2FF" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="131"/>
+            <Button Command="{Binding ClearChatComand}" Content="Clear Chat" Margin="0,0,149,5" Background="#FF55C2FF" HorizontalAlignment="Right" Width="79" Height="20" VerticalAlignment="Bottom"/>
+            <Button Command="{Binding OpenHugginFaceCommand}" Content="Go to HugginFace GGUF models" Margin="0,0,10,30" Height="20" VerticalAlignment="Bottom" Background="#FF5565FF" HorizontalAlignment="Right" Width="218"/>
             <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1">
                 <GridSplitter.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -140,7 +137,67 @@
                     </Paragraph>
                 </FlowDocument>
             </RichTextBox>
-            <Button Command="{Binding KillBotCommand}" Content="Kill Bot" Margin="10,0,0,10" Background="#FFFF385C" HorizontalAlignment="Left" Width="79" Height="20" VerticalAlignment="Bottom"/>
+            <Button Command="{Binding KillBotCommand}" Content="Kill Bot" Margin="10,0,0,5" Background="#FFFF385C" HorizontalAlignment="Left" Width="79" Height="20" VerticalAlignment="Bottom"/>
+            <xctk:PropertyGrid x:Name="LlamaSharpPropetyGrid" DataContext="{Binding SamplingPipelineModel}" AutoGenerateProperties="False" ShowAdvancedOptions="True" 
+                              ShowDescriptionByTooltip="True" ShowPreview="True" ShowSortOptions="True" ShowSummary="True" 
+                              ShowTitle="True" SelectedObject="{Binding}" Margin="0,68,10,55">
+                <xctk:PropertyGrid.PropertyDefinitions>
+                    <!--Floats -->
+                    <xctk:PropertyDefinition TargetProperties="RepeatPenalty" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="FrequencyPenalty" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="PresencePenalty" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="Temperature" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="TypicalP" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="TopP" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="MinP" >
+                    </xctk:PropertyDefinition>
+                    <!-- ints -->
+                    <xctk:PropertyDefinition TargetProperties="MinKeep" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="PenaltyCount" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="Seed" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="TopK" >
+                    </xctk:PropertyDefinition>
+                    <!-- bools -->
+                    <xctk:PropertyDefinition TargetProperties="PenalizeNewline" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="PreventEOS" >
+                    </xctk:PropertyDefinition>
+                    <!-- no primative -->
+                    <xctk:PropertyDefinition TargetProperties="Grammar" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="GrammarOptimization" >
+                    </xctk:PropertyDefinition>
+                    <xctk:PropertyDefinition TargetProperties="LogitBias" >
+                    </xctk:PropertyDefinition>
+                </xctk:PropertyGrid.PropertyDefinitions>
+                <xctk:PropertyGrid.EditorDefinitions>
+                    <xctk:EditorTemplateDefinition 
+                        TargetProperties="Temperature,RepeatPenalty,FrequencyPenalty,PresencePenalty,TypicalP,TopP,MinP">
+                        <xctk:EditorTemplateDefinition.EditingTemplate>
+                            <DataTemplate>
+                                <xctk:DecimalUpDown ClipValueToMinMax="True"  Increment="0.02" Text="{Binding Value, Mode=TwoWay}" />
+                            </DataTemplate>
+                        </xctk:EditorTemplateDefinition.EditingTemplate>
+                    </xctk:EditorTemplateDefinition>
+                    <!--<xctk:EditorTemplateDefinition 
+                        TargetProperties="Temperature">
+                        <xctk:EditorTemplateDefinition.EditingTemplate>
+                            <DataTemplate>
+                                <Slider Value="{Binding Value, Mode=TwoWay}" Minimum="0" Maximum="1" SmallChange="0.5" />
+                            </DataTemplate>
+                        </xctk:EditorTemplateDefinition.EditingTemplate>
+                    </xctk:EditorTemplateDefinition>-->
+                </xctk:PropertyGrid.EditorDefinitions>
+            </xctk:PropertyGrid>
         </Grid>
         <ListBox x:Name="ChatListBox" HorizontalContentAlignment="Stretch" ScrollViewer.CanContentScroll="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible" Grid.Row="0" Margin="10,10,10,0" 
             ItemsSource="{Binding ChatMessages}" Background="#FFACD4E6" BorderBrush="#FF2E5DEB" RenderTransformOrigin="0.5,0.5" >
@@ -168,7 +225,7 @@
                 </TransformGroup>
             </TextBox.RenderTransform>
         </TextBox>
-        <Button x:Name="sendButton" Content="Send" Command="{Binding SendInputCommand}" Margin="351,10,0,10" FontSize="18" Foreground="#FF1B4225" Grid.Row="1" Background="#FFACD4E6" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Width="134">
+        <Button x:Name="sendButton" Content="Send" Command="{Binding SendInputCommand}" Margin="0,10,10,10" FontSize="18" Foreground="#FF1B4225" Grid.Row="1" Background="#FFACD4E6" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Width="134">
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>

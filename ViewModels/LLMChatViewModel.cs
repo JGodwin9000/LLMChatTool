@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LLama.Sampling;
 using LLMChatTool.Classes;
 using LLMChatTool.Models;
 using System.Collections.ObjectModel;
@@ -15,18 +16,17 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
     public const string STARTUP_MESSAGE = "Let's Chat!";
     private readonly string MODEL_FOLDER_PATH = Path.Combine(AppContext.BaseDirectory, LANGUAGE_MODEL_DIRECTORY);
     private const string LANGUAGE_MODEL_DIRECTORY = "GGUF_MODELS";
-    private const string TEMPERATURE_TOOLTIP_MESSAGE = "A value between zero and 1. The higher the number, the more creative.";
-    private const string NO_MODEL_SELECTED_ERROR = "Unable to start the bot. No model file has been selected.";
+    private const string NO_MODEL_SELECTED_ERROR = "Unable to start. No model file has been selected.";
 
     private ChatMessageViewModel _currentBotMessage = null;
     private bool _isDirty = false;
     private Visibility _applyChangesLabelVisibility = Visibility.Hidden;
     private string _inputText = string.Empty;
-    private float _temperature = 0.81f;
     private FileSystemInfo _selectedModelFileInfo = null;
     private ObservableCollection<ChatMessageViewModel> _chatMessageCollection = new ObservableCollection<ChatMessageViewModel>();
     private List<FileSystemInfo> _llmFileInfos = null;
     private ChatBotLlamaSharp _llamaBot = new ChatBotLlamaSharp();
+    private SamplingPipelineModel _samplingPipelineModel = new SamplingPipelineModel();
 
     public ICommand MainInputCommand => new RelayCommand(ProcessMainInput);
     public ICommand SendInputCommand => new RelayCommand(ProcessMainInput);
@@ -35,6 +35,19 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
     public ICommand OpenModelsFolderCommand => new RelayCommand(OpenModelsFolder);
     public ICommand OpenHugginFaceCommand => new RelayCommand(OpenHuggingFace);
     public ICommand KillBotCommand => new RelayCommand(KillRunningBot);
+
+    public SamplingPipelineModel SamplingPipelineModel
+    {
+        get
+        {
+            return _samplingPipelineModel;
+        }
+
+        set
+        {
+            _samplingPipelineModel = value;
+        }
+    }
 
     public ObservableCollection<ChatMessageViewModel> ChatMessages
     {
@@ -62,28 +75,6 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
             {
                 ApplyChangesLabelVisibility = Visibility.Hidden;
             }
-        }
-    }
-
-    public float Temperature
-    {
-        get
-        {
-            return _temperature;
-        }
-
-        set
-        {
-            IsDirty = true;
-            SetProperty(ref _temperature, value);
-        }
-    }
-
-    public string TemperatureTooltipMessage
-    {
-        get
-        {
-            return TEMPERATURE_TOOLTIP_MESSAGE;
         }
     }
 
@@ -229,11 +220,10 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
         }
 
         OutputSystemMessage($"{STARTUP_MESSAGE}\n\nSeclectedModel: {_selectedModelFileInfo.Name}");
-        _llamaBot.Temperature = _temperature;
         _llamaBot.ModelFullName = _selectedModelFileInfo.FullName;
         try
         {
-            _llamaBot.Start();
+            _llamaBot.Start(_samplingPipelineModel.ToDefaultSamplingPipeline());
         }
         catch (Exception ex)
         {
