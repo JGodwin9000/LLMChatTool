@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LLama.Sampling;
 using LLMChatTool.Classes;
 using LLMChatTool.Models;
+using LLMChatTool.Models.Messages;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -13,7 +13,7 @@ namespace LLMChatTool.ViewModels;
 
 public class LLMChatViewModel : ObservableRecipient, IDisposable
 {
-    public const string STARTUP_MESSAGE = "Let's Chat!";
+    public const string STARTUP_MESSAGE = "Chat started";
     private readonly string MODEL_FOLDER_PATH = Path.Combine(AppContext.BaseDirectory, LANGUAGE_MODEL_DIRECTORY);
     private const string LANGUAGE_MODEL_DIRECTORY = "GGUF_MODELS";
     private const string NO_MODEL_SELECTED_ERROR = "Unable to start. No model file has been selected.";
@@ -75,6 +75,14 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
             {
                 ApplyChangesLabelVisibility = Visibility.Hidden;
             }
+        }
+    }
+
+    public bool IsRunning
+    {
+        get
+        {
+            return _llamaBot.IsRunning;
         }
     }
 
@@ -160,7 +168,7 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
 
         Messenger.Register<LLMChatViewModel, EndBotMessage, int>(this, 1, (r, msg) =>
         {
-            if (_currentBotMessage.Text.EndsWith("User:"))
+            if (_currentBotMessage != null && _currentBotMessage.Text.EndsWith("User:"))
             {
                 _currentBotMessage.Text = _currentBotMessage.Text.Replace("User:", string.Empty);
             }
@@ -185,6 +193,11 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
             ScrollToBottom();
         });
 
+        Messenger.Register<LLMChatViewModel, PropertyGridValueChangeMessage, int>(this, 1, (r, msg) =>
+        {
+             IsDirty = true;           
+        });
+
         if (Directory.Exists(MODEL_FOLDER_PATH))
         {
             var dirInfo = new DirectoryInfo(MODEL_FOLDER_PATH);
@@ -199,6 +212,7 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
 
     private void KillRunningBot()
     {
+        IsDirty = true;
         _llamaBot.KillBot();
     }
 
@@ -220,6 +234,7 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
         }
 
         OutputSystemMessage($"{STARTUP_MESSAGE}\n\nSeclectedModel: {_selectedModelFileInfo.Name}");
+
         _llamaBot.ModelFullName = _selectedModelFileInfo.FullName;
         try
         {
@@ -268,6 +283,8 @@ public class LLMChatViewModel : ObservableRecipient, IDisposable
     private void ProcessMainInput()
     {
         if (string.IsNullOrWhiteSpace(InputText)) { return; }
+        if (!IsRunning) { return; }
+
         if (_selectedModelFileInfo == null)
         {
             OutputSystemMessage($@"Please select a model from the drop down. 

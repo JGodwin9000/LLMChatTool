@@ -2,7 +2,7 @@
 using LLama;
 using LLama.Common;
 using LLama.Sampling;
-using LLMChatTool.Models;
+using LLMChatTool.Models.Messages;
 using System.IO;
 
 namespace LLMChatTool.Classes;
@@ -21,12 +21,21 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
     private ChatSession _session = null;
     private InferenceParams _inferenceParams = null;
     private string _modelFullName = string.Empty;
-    private bool _killBot = false;
+    private bool _isRunning  = false;
+    private CancellationTokenSource _chatCancelToken;
 
     private EndBotMessage _endBotMessageModel = new EndBotMessage();
     private PartialBotOutputMessage _partialBotOutputModel = new PartialBotOutputMessage();
     private SystemOutputMessage _systemOutputModel = new SystemOutputMessage();
     private AppOutputMessage _appOutputModel = new AppOutputMessage();
+
+    public bool IsRunning
+    {
+        get
+        {
+            return _isRunning;
+        }
+    }
 
     public string ModelFullName
     {
@@ -43,6 +52,8 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
 
     public void Start(DefaultSamplingPipeline samplingPipeline)
     {
+        _isRunning = false;
+
         if (string.IsNullOrWhiteSpace(_modelFullName))
         {
             OutputSystemMessage("Please select a model.");
@@ -61,13 +72,20 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
         {
             Dispose();
 
+            _chatCancelToken = new CancellationTokenSource();
+
             _parameters = new ModelParams(_modelFullName)
             {
                 ContextSize = CONTEXT_SIZE,
                 GpuLayerCount = GPU_LAYER_COUNT
             };
 
+            var modelFileInfo = new FileInfo(_modelFullName);
+
+            OutputAppMessage($"Loading model file: {modelFileInfo.Name}");
             _model = LLamaWeights.LoadFromFile(_parameters);
+            OutputAppMessage("Model loaded");
+
             _context = _model.CreateContext(_parameters);
             _chatHistory = new ChatHistory();
 
@@ -84,9 +102,15 @@ public class ChatBotLlamaSharp : ObservableRecipient, IDisposable
                 AntiPrompts = new List<string> { "User:" }, // Stop generation once antiprompts appear.
                 SamplingPipeline = samplingPipeline,
             };
+
+            _isRunning = true;
+
+            OutputAppMessage($"Bot Started. {modelFileInfo.Name}");
+            OutputAppMessage("Ready for input");
         }
         catch (Exception ex)
         {
+            _isRunning = false;
             OutputSystemMessage($"Error starting the bot. See output window.");
             OutputAppMessage($"{Environment.NewLine}{ex.Message}{Environment.NewLine}{ex.StackTrace}");
         }
@@ -104,24 +128,28 @@ to answer the User's requests immediately and with precision. Bob talks like a y
     public async Task ProcessInput(string userInput)
     {
         if (string.IsNullOrWhiteSpace(userInput)) return;
-
+        if(!_isRunning) return;
+        
         try
         {
-            await foreach (var text in _session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), _inferenceParams))
+            await foreach (var text in _session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), _inferenceParams, _chatCancelToken.Token))
             {
-                if (!_killBot)
+                if (_isRunning && !_chatCancelToken.IsCancellationRequested)
                 {
-                    _chatHistory.AddMessage(AuthorRole.User, userInput);
-                    OutputParialBotMessage(text);
+                    if(_session != null && _chatHistory != null)
+                    {
+                        _chatHistory.AddMessage(AuthorRole.User, userInput);
+                        OutputParialBotMessage(text);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 else
                 {
-                    _killBot = false;
-                    Dispose();
-                    OutputSystemMessage("Bot has been killed by user.");
-                    OutputAppMessage("Bot has been killed by user.");
                     break;
-                }
+                }                   
             }
 
             Messenger.Send(_endBotMessageModel, 1);
@@ -152,11 +180,22 @@ to answer the User's requests immediately and with precision. Bob talks like a y
 
     public void KillBot()
     {
-        _killBot = true;
+        if(!_isRunning)
+        {
+            Dispose();
+        } else
+        {
+            _chatCancelToken.Cancel();
+            _isRunning = false;
+        }           
+
+        OutputSystemMessage("Bot has been killed by user.");
+        OutputAppMessage("Bot has been killed by user.");
     }
 
     public void Dispose()
     {
+
         if (_model != null)
         {
             _model.Dispose();
@@ -166,5 +205,7 @@ to answer the User's requests immediately and with precision. Bob talks like a y
         {
             _context.Dispose();
         }
+
+        _isRunning = false;
     }
 }

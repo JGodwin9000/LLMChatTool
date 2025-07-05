@@ -1,9 +1,10 @@
 ﻿using LLMChatTool.Classes;
-using LLMChatTool.Models;
+using LLMChatTool.Models.Messages;
 using LLMChatTool.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
+using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace LLMChatTool.Views;
 
@@ -77,5 +78,10 @@ public partial class LLMChatView : Window
             _enterMessage.Text = ((TextBox)sender).Text;
             _messengerHelper.Messenger.Send(_enterMessage, 1);
         }
+    }
+
+    private void LlamaSharpPropetyGrid_PropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
+    {
+        _messengerHelper.Messenger.Send(new PropertyGridValueChangeMessage(), 1);
     }
 }

@@ -4,9 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LLMChatTool"
+        xmlns:models="clr-namespace:LLMChatTool.Models"
         xmlns:vm="clr-namespace:LLMChatTool.ViewModels"
         xmlns:views="clr-namespace:LLMChatTool.Views"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:collections="clr-namespace:System.Collections.Generic;assembly=mscorlib"
         mc:Ignorable="d"
         Title="LLM Chat Tool" Height="700" Width="1000">
     <Window.DataContext>
@@ -130,7 +132,7 @@
                     </LinearGradientBrush>
                 </GridSplitter.Background>
             </GridSplitter>
-            <RichTextBox x:Name="RichTextBoxOutput" IsReadOnly="True" Grid.Row="2" Margin="0,5,10,10" Background="#FF141519" Foreground="#FF72FF58">
+            <RichTextBox x:Name="RichTextBoxOutput" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Grid.Row="2" Margin="0,5,10,10" Background="#FF141519" Foreground="#FF72FF58">
                 <FlowDocument>
                     <Paragraph>
                         <Run x:Name="OutputRun" d:Text="12:00:00 PM - sample output"/>
@@ -138,9 +140,9 @@
                 </FlowDocument>
             </RichTextBox>
             <Button Command="{Binding KillBotCommand}" Content="Kill Bot" Margin="10,0,0,5" Background="#FFFF385C" HorizontalAlignment="Left" Width="79" Height="20" VerticalAlignment="Bottom"/>
-            <xctk:PropertyGrid x:Name="LlamaSharpPropetyGrid" DataContext="{Binding SamplingPipelineModel}" AutoGenerateProperties="False" ShowAdvancedOptions="True" 
-                              ShowDescriptionByTooltip="True" ShowPreview="True" ShowSortOptions="True" ShowSummary="True" 
-                              ShowTitle="True" SelectedObject="{Binding}" Margin="0,68,10,55">
+            <xctk:PropertyGrid x:Name="LlamaSharpPropetyGrid" PropertyValueChanged="LlamaSharpPropetyGrid_PropertyValueChanged" DataContext="{Binding SamplingPipelineModel}" AutoGenerateProperties="False" ShowAdvancedOptions="True" 
+                              ShowDescriptionByTooltip="True" ShowPreview="False" ShowSortOptions="True" ShowSummary="True" 
+                              ShowTitle="False" SelectedObject="{Binding}" Margin="0,68,10,55">
                 <xctk:PropertyGrid.PropertyDefinitions>
                     <!--Floats -->
                     <xctk:PropertyDefinition TargetProperties="RepeatPenalty" >
@@ -171,31 +173,24 @@
                     </xctk:PropertyDefinition>
                     <xctk:PropertyDefinition TargetProperties="PreventEOS" >
                     </xctk:PropertyDefinition>
-                    <!-- no primative -->
+                    <!-- non primative -->
                     <xctk:PropertyDefinition TargetProperties="Grammar" >
                     </xctk:PropertyDefinition>
                     <xctk:PropertyDefinition TargetProperties="GrammarOptimization" >
                     </xctk:PropertyDefinition>
-                    <xctk:PropertyDefinition TargetProperties="LogitBias" >
-                    </xctk:PropertyDefinition>
+                    <!-- TODO: deal with the struct in the llamaToken property of the LogitBiasModel -->
+                    <!--<xctk:PropertyDefinition TargetProperties="LogitBias" >
+                    </xctk:PropertyDefinition>-->
                 </xctk:PropertyGrid.PropertyDefinitions>
                 <xctk:PropertyGrid.EditorDefinitions>
                     <xctk:EditorTemplateDefinition 
                         TargetProperties="Temperature,RepeatPenalty,FrequencyPenalty,PresencePenalty,TypicalP,TopP,MinP">
                         <xctk:EditorTemplateDefinition.EditingTemplate>
                             <DataTemplate>
-                                <xctk:DecimalUpDown ClipValueToMinMax="True"  Increment="0.02" Text="{Binding Value, Mode=TwoWay}" />
+                                <xctk:DecimalUpDown ClipValueToMinMax="True" Increment="0.02" Text="{Binding Value, Mode=TwoWay}" />
                             </DataTemplate>
                         </xctk:EditorTemplateDefinition.EditingTemplate>
                     </xctk:EditorTemplateDefinition>
-                    <!--<xctk:EditorTemplateDefinition 
-                        TargetProperties="Temperature">
-                        <xctk:EditorTemplateDefinition.EditingTemplate>
-                            <DataTemplate>
-                                <Slider Value="{Binding Value, Mode=TwoWay}" Minimum="0" Maximum="1" SmallChange="0.5" />
-                            </DataTemplate>
-                        </xctk:EditorTemplateDefinition.EditingTemplate>
-                    </xctk:EditorTemplateDefinition>-->
                 </xctk:PropertyGrid.EditorDefinitions>
             </xctk:PropertyGrid>
         </Grid>

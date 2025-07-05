@@ -1,6 +1,7 @@
 ﻿using LLama.Native;
 using LLama.Sampling;
 using System.ComponentModel;
+using System.Linq;
 using static LLama.Sampling.DefaultSamplingPipeline;
 
 namespace LLMChatTool.Models;
@@ -14,7 +15,7 @@ public class SamplingPipelineModel
     //private DefaultSamplingPipeline _workingSamplingPipeline;
 
     [Description($"Bias values to add to certain logits\nType: IReadOnlyDictionary<LLamaToken, float>")]
-    public IReadOnlyDictionary<LLamaToken, float> LogitBias { get; set; } = new Dictionary<LLamaToken, float>();
+    public List<LogitBiasModel> LogitBias { get; set; } = new List<LogitBiasModel>();
 
     //"as described in https://arxiv.org/abs/1909.05858"
     [Description("Repetition penalty\nType: float")]
@@ -132,7 +133,7 @@ Type: float")]
             FrequencyPenalty = FrequencyPenalty,
             Grammar = Grammar,
             GrammarOptimization = GrammarOptimization,
-            LogitBias = LogitBias,
+            LogitBias = LogitBias.ToDictionary(x => x.LLamaToken, x => x.Value),
             MinKeep = MinKeep,
             MinP = MinP,
             PenalizeNewline = PenalizeNewline,
@@ -168,7 +169,7 @@ Type: float")]
         // --- other types
         Grammar = samplingPipline.Grammar;
         GrammarOptimization = samplingPipline.GrammarOptimization;
-        LogitBias = samplingPipline.LogitBias;       
+        LogitBias = samplingPipline.LogitBias.Select(x => new LogitBiasModel() { LLamaToken = x.Key, Value = x.Value}).ToList();   
        
         //--- bools
         PenalizeNewline = samplingPipline.PenalizeNewline;

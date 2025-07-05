@@ -1,4 +1,4 @@
-﻿namespace LLMChatTool.Models;
+﻿namespace LLMChatTool.Models.Messages;
 
 public class PartialBotOutputMessage
 {
